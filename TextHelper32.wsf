@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+
+<package>
+<job id="TextHelper32">
+<?job error="True" debug="False"?>
+
+<object id="CMD" progid="WScript.Shell" />
+<object id="FILER" progid="Scripting.FileSystemObject" />
+
+<script language="JavaScript">
+<![CDATA[
+
+  var Combine = function(joint, part){
+    plain = arguments.length > 1 ? FILER.BuildPath(joint, part) : joint;
+    if(!(/^".*"$/g).test(plain) && (/\s/g).test(plain)){return '"' + plain + '"'}else{return plain} };
+
+  var SystemRoot = CMD.ExpandEnvironmentStrings("%SystemRoot%");
+  CMD.Environment("Process").Item("PATH") = Combine(SystemRoot, "System32");
+  CMD.Environment("Process").Remove("CLASSPATH");
+  CMD.Environment("Process").Remove("JYTHONPATH");
+
+  var ExecDir = FILER.GetParentFolderName(WSH.ScriptFullName);
+  var EntryPoint = Combine(ExecDir, "EntryPoint32.jar");
+  var JavaBin = Combine(Combine(Combine(ExecDir, "JRE8x86"), "bin"), "java.exe");
+
+  CMD.Environment("Process").Item("PYTHONIOENCODING") = "utf-8:utf-8";
+
+  var LogBegin = "(echo ##### TEXT HELPER Start " + new Date().toLocaleString() + " #####&&";
+  var LogEnd = "echo ##### TEXT HELPER Exit " + new Date().toLocaleString() + " #####";
+  var StdOut = Combine(ExecDir, Combine("logs", "output.log"));
+
+  var Status = !CMD.Run("cmd /c " + LogBegin + JavaBin + " -Dpython.console.encoding=utf-8 -jar " + EntryPoint + ") > " + StdOut + " 2>&1", 0, true);
+
+  CMD.Run("cmd /c " + LogEnd + " >> " + StdOut + " 2>&1", 0, true);
+
+  if(Status){WSH.Quit(true)}else{CMD.Run("notepad.exe " + StdOut, 1, false); WSH.Quit(false)}
+
+]]>
+</script>
+
+</job>
+</package>

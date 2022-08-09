@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Created-By: 1.8.0 (AdoptOpenJDK)
+Main-Class: Main
+Class-Path: TextHelperWin.jar TextHelperWin/ HotKeySupport.jar jython-standalone-2.7.2.jar sikulix.jar h2-2.1.212.jar
+SplashScreen-Image: META-INF/images/splash-image.png
